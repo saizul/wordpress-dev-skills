@@ -1,0 +1,43 @@
+name: Bug report
+description: A script crashed or gave a wrong result, or a skill gave wrong advice
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste real secrets, wp-config.php values or customer data.** Replace them with placeholders.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - wp-plugin-scaffold
+        - wp-security-review
+        - wp-cli-ops
+        - wp-performance-audit
+        - wp-block-dev
+        - woocommerce-dev
+        - wp-hardening
+        - wp-readme-txt
+        - repository / validator
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: The command or prompt, the output, and a minimal code sample for scanner issues.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Claude Code 2.x / Codex CLI, Python 3.12, macOS; WordPress 6.8, WooCommerce 10.x"

@@ -1,0 +1,14 @@
+{
+  "name": "wp-dev",
+  "displayName": "WordPress Dev Skills",
+  "version": "0.1.0",
+  "description": "Agent Skills for WordPress developers: plugin scaffolding, security review, WP-CLI operations, performance audits, block development, WooCommerce/HPOS, hardening and readme.txt.",
+  "author": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "homepage": "https://github.com/saizul/wordpress-dev-skills",
+  "repository": "https://github.com/saizul/wordpress-dev-skills",
+  "license": "MIT",
+  "keywords": ["wordpress", "woocommerce", "wp-cli", "gutenberg", "security", "performance", "agent-skills"]
+}

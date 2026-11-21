@@ -1,0 +1,45 @@
+name: New skill proposal
+description: Propose (or offer to write) a new WordPress skill
+labels: ["new skill", "good first issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See "Write a skill" in CONTRIBUTING.md. Good skills cover one task developers repeat, with exact commands and a checklist.
+  - type: input
+    id: name
+    attributes:
+      label: Skill name
+      placeholder: "wp-theme-json"
+    validations:
+      required: true
+  - type: textarea
+    id: when
+    attributes:
+      label: When should an agent use it?
+      description: Situations and phrases that should trigger the skill, and what it is NOT for.
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow outline
+      description: The steps, commands and decision points.
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: Helper script (optional)
+      description: What a deterministic script could check or generate (stdlib Python or POSIX sh).
+  - type: textarea
+    id: sources
+    attributes:
+      label: Official docs
+      description: Links to developer.wordpress.org, WP-CLI, WooCommerce or other docs the skill relies on.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to write this skill

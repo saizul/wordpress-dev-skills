@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint and validate skills
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install tools
+        run: python -m pip install --upgrade pip ruff pytest
+      - name: Ruff
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Validate skills and marketplace
+        run: python tools/validate_skills.py
+
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: python -m pip install --upgrade pip pytest
+      - name: Validate skills
+        run: python tools/validate_skills.py
+      - name: Test
+        run: pytest
+      - name: Script smoke test
+        run: |
+          for s in skills/*/scripts/*.py; do python "$s" --help > /dev/null; done
+          python skills/wp-security-review/scripts/wp_security_scan.py tests/fixtures/security/safe.php
+          python skills/wp-plugin-scaffold/scripts/scaffold_plugin.py demo-plugin --dest "$RUNNER_TEMP"
+          python skills/wp-security-review/scripts/wp_security_scan.py "$RUNNER_TEMP/demo-plugin"
+          python skills/wp-readme-txt/scripts/readme_txt.py validate "$RUNNER_TEMP/demo-plugin/readme.txt" --plugin-file "$RUNNER_TEMP/demo-plugin/demo-plugin.php"

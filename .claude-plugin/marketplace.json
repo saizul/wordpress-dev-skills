@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "wordpress-dev-skills",
+  "description": "Agent Skills for WordPress and WooCommerce developers.",
+  "owner": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "plugins": [
+    {
+      "name": "wp-dev",
+      "source": "./",
+      "description": "8 WordPress skills: plugin scaffold, security review, WP-CLI ops, performance audit, block dev, WooCommerce/HPOS, hardening, readme.txt.",
+      "category": "development",
+      "tags": ["wordpress", "woocommerce", "wp-cli", "gutenberg", "security"],
+      "metadata": {
+        "skills": [
+          "wp-plugin-scaffold",
+          "wp-security-review",
+          "wp-cli-ops",
+          "wp-performance-audit",
+          "wp-block-dev",
+          "woocommerce-dev",
+          "wp-hardening",
+          "wp-readme-txt"
+        ]
+      }
+    }
+  ]
+}
