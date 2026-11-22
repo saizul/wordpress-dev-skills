@@ -62,3 +62,48 @@ def test_cli(fixtures):
     assert ok.returncode == 0
     assert run_script(SKILL, SCRIPT, "--help").returncode == 0
     assert run_script(SKILL, SCRIPT, "/nonexistent/path").returncode == 2
+
+
+MULTILINE_JOIN = """<?php
+global $wpdb;
+$rows = $wpdb->get_results(
+    "SELECT p.ID, pm.meta_value
+     FROM {$wpdb->posts} p
+     INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID
+     WHERE pm.meta_key = '_billing_email'; -- semicolon inside the SQL string
+     AND p.post_status = 'wc-processing'"
+);
+"""
+
+
+def test_multiline_postmeta_join_for_order_meta():
+    findings, _ = hpos.scan_file_text(MULTILINE_JOIN, "x.php")
+    assert [(f.rule, f.line) for f in findings] == [("HPOS011", 6)]
+    assert "wc_orders_meta" in findings[0].fix
+
+
+def test_postmeta_sql_with_order_id():
+    src = '<?php\n$wpdb->get_var( $wpdb->prepare(\n  "SELECT meta_value FROM $wpdb->postmeta\n'
+    src += "   WHERE post_id = %d AND meta_key = %s\", $order_id, '_my_key' ) );\n"
+    findings, _ = hpos.scan_file_text(src, "x.php")
+    assert [(f.rule, f.line) for f in findings] == [("HPOS011", 3)]
+
+
+def test_postmeta_sql_for_products_and_ignores_not_flagged():
+    product = (
+        "<?php $wpdb->get_col( \"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_sku'\" );"
+    )
+    assert hpos.scan_file_text(product, "x.php")[0] == []
+    ignored = (
+        "<?php $wpdb->query( \"DELETE FROM {$wpdb->postmeta} WHERE meta_key = '_order_key'\" );"
+        " // hpos-ignore"
+    )
+    assert hpos.scan_file_text(ignored, "x.php")[0] == []
+    commented = "<?php\n// $wpdb->postmeta has _billing_email\n$x = 1;\n"
+    assert hpos.scan_file_text(commented, "x.php")[0] == []
+
+
+def test_postmeta_sql_not_double_reported_with_hpos004():
+    src = "<?php $wpdb->get_results( \"SELECT * FROM {$wpdb->postmeta} pm JOIN x WHERE type='shop_order'\" );"
+    rules = [f.rule for f in hpos.scan_file_text(src, "x.php")[0]]
+    assert rules == ["HPOS004"]

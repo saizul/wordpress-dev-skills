@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- `woocommerce-dev`: `hpos_check.py` rule HPOS011 flags SQL that reads or joins
+  `$wpdb->postmeta` for order meta (order meta keys such as `_billing_email`, `$order_id`
+  or `shop_order`), also when the query spans several lines or contains `;` in the SQL.
+
 ## [0.1.0] - 2026-11-21
 
 ### Added
