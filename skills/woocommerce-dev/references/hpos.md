@@ -23,6 +23,7 @@ but code must not rely on it.
 | HPOS008 | `add_meta_box( 'id', 'Title', 'cb', 'shop_order' )` | screen `wc_get_page_screen_id( 'shop-order' )`; the callback receives a `WP_Post` (legacy) or `WC_Order` (HPOS): `$order = $post_or_order instanceof WP_Post ? wc_get_order( $post_or_order->ID ) : $post_or_order;` |
 | HPOS009 | `metadata_exists( 'post', $order_id, '_key' )` | `$order->meta_exists( '_key' )` |
 | HPOS010 | `manage_edit-shop_order_columns` only | also `manage_woocommerce_page_wc-orders_columns` and `manage_woocommerce_page_wc-orders_custom_column` (args: `$column, $order`) |
+| HPOS011 | `"SELECT ... FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} pm ... WHERE pm.meta_key = '_billing_email'"` (also across several lines) | `wc_get_orders( array( 'meta_query' => array( ... ) ) )` or `$order->get_meta()`; for unavoidable SQL use `OrderUtil::get_table_for_order_meta()` |
 | HPOS100 | no declaration | `FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true )` on `before_woocommerce_init` |
 
 `OrderUtil` is `Automattic\WooCommerce\Utilities\OrderUtil`.

@@ -165,7 +165,7 @@ are a great place to start:
 - [ ] `wp-cron-debug`: script to analyze `wp cron event list` output for duplicates
 - [ ] `woocommerce-payments-dev`: payment gateway skeleton with Store API/blocks support
 - [ ] Security scanner: heredoc support and taint tracking across lines in one function
-- [ ] HPOS scanner: detect `$wpdb->postmeta` joins for order meta
+- [x] HPOS scanner: detect `$wpdb->postmeta` joins for order meta
 
 ## Contributing
 

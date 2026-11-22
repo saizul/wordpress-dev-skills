@@ -100,6 +100,46 @@ LINE_RULES = [
     ),
 ]
 
+# HPOS011: SQL that reads order meta from postmeta, possibly spread over several lines.
+POSTMETA_SQL = re.compile(r"\$wpdb->postmeta\b|\bwp_postmeta\b")
+ORDER_META_HINT = re.compile(
+    r"shop_order|\$order_id\b|['\"](?:_billing_|_shipping_|_order_|_customer_user|_payment_method|"
+    r"_transaction_id|_paid_date|_date_paid|_date_completed|_cart_hash)"
+)
+SQL_RULE = (
+    "HPOS011",
+    "high",
+    "SQL reads or joins postmeta for order meta",
+    "With HPOS, order meta lives in wc_orders_meta: use wc_get_orders( array( 'meta_query' "
+    "=> ... ) ), $order->get_meta(), or OrderUtil::get_table_for_order_meta() when SQL is "
+    "unavoidable.",
+)
+
+
+def statements(code: str):
+    """Yield (start offset, text) for each PHP statement (split on ';' outside strings).
+
+    ``code`` must already have comments stripped. Semicolons inside string literals
+    (common in SQL) do not end a statement.
+    """
+    start, state, i, n = 0, None, 0, len(code)
+    while i < n:
+        c = code[i]
+        if state is None:
+            if c in ("'", '"'):
+                state = c
+            elif c == ";":
+                yield start, code[start : i + 1]
+                start = i + 1
+        elif c == "\\":
+            i += 1
+        elif c == state:
+            state = None
+        i += 1
+    if start < n:
+        yield start, code[start:]
+
+
 LEGACY_LIST_HOOKS = re.compile(
     r"['\"](?:manage_edit-shop_order_columns|manage_shop_order_posts_custom_column|"
     r"bulk_actions-edit-shop_order|handle_bulk_actions-edit-shop_order)['\"]"
@@ -188,6 +228,17 @@ def scan_file_text(src: str, path: str) -> tuple[list[Finding], dict]:
         for rid, sev, rx, msg, fix in LINE_RULES:
             if rx.search(line):
                 findings.append(Finding(rid, sev, msg, path, idx, raw.strip()[:200], fix))
+    flagged = {f.line for f in findings if f.rule == "HPOS004"}
+    for offset, stmt in statements(code):
+        match = POSTMETA_SQL.search(stmt)
+        if not match or not ORDER_META_HINT.search(stmt):
+            continue
+        idx = code.count("\n", 0, offset + match.start()) + 1
+        raw = raw_lines[idx - 1] if idx <= len(raw_lines) else ""
+        if idx in flagged or "hpos-ignore" in raw:
+            continue
+        rid, sev, msg, fix = SQL_RULE
+        findings.append(Finding(rid, sev, msg, path, idx, raw.strip()[:200], fix))
     facts = {"declarations": {}, "legacy_list_hooks": [], "hpos_list_hooks": False}
     for m in DECLARE.finditer(code):
         flag = m.group(2) or "true"

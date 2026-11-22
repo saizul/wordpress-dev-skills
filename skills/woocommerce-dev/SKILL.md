@@ -29,7 +29,7 @@ configuration questions, payment gateway certification.
    python3 scripts/hpos_check.py path/to/extension --json     # for further processing
    ```
    It flags post-meta access on orders, `get_post()` on orders, `WP_Query`/`get_posts`
-   with `shop_order`, direct SQL on posts for orders, post lifecycle hooks, legacy
+   with `shop_order`, direct SQL on posts or postmeta for orders, post lifecycle hooks, legacy
    order-list hooks without the HPOS equivalents, meta boxes bound to `shop_order`,
    and missing `declare_compatibility()` calls.
 2. **Fix each finding** with the replacements in [references/hpos.md](references/hpos.md).
